@@ -154,7 +154,7 @@ resource "aws_instance" "Web" {
   instance_type = "t2.micro"
   subnet_id = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.app_SG.id]
-  key_name = "Stefan_Terraform"
+  # key_name = "Stefan_Terraform"
   associate_public_ip_address = true
   user_data = data.template_file.initapp.rendered
 
