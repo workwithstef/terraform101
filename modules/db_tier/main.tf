@@ -1,52 +1,5 @@
-provider "aws" {
-  region = "eu-west-1"
-}
-
-resource "aws_vpc" "VPC" {
-  cidr_block       = "99.0.0.0/16"
-  instance_tenancy = "default"
-
-  tags = {
-    Name = "Eng57.Stefan.Terra.VPC"
-  }
-}
-
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.VPC.id
-
-  tags = {
-    Name = "Stefan.Terra.IGW"
-  }
-}
-
-module "app_tier" {
-  source = "./modules/app_tier"
-  vpc_id = aws_vpc.VPC.id
-  my_ip = var.my_ip
-  ssh_key_var = var.ssh_key
-  igw_id = aws_internet_gateway.igw.id
-  db_private_ip = aws_instance.DB.private_ip
-  # public_route_id = aws_route_table.public_route.id
-
-
-}
-
-# module "db_tier" {
-#   source = "./modules/db_tier"
-#   vpc_id = aws_vpc.VPC.id
-#   my_ip = var.my_ip
-# }
-
-# resource "aws_route_table" "private_route" {
-#   vpc_id = aws_vpc.VPC.id
-#
-#   tags = {
-#     Name = "Stefan.Route.Priv"
-#   }
-# }
-
 resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.VPC.id
+  vpc_id     = var.vpc_id
   cidr_block = "99.0.2.0/24"
   map_public_ip_on_launch = true
 
@@ -57,7 +10,7 @@ resource "aws_subnet" "private" {
 resource "aws_security_group" "db_SG" {
   name        = "Stefan.Terra.DB.SG"
   description = "Allow http and https inbound traffic"
-  vpc_id      = aws_vpc.VPC.id
+  vpc_id      = var.vpc_id
 
 
   ingress {
@@ -90,7 +43,7 @@ resource "aws_security_group" "db_SG" {
 }
 
 resource "aws_network_acl" "private_NACL" {
-  vpc_id = aws_vpc.VPC.id
+  vpc_id = var.vpc_id
   subnet_ids = [aws_subnet.private.id]
 
   ingress {
@@ -143,23 +96,7 @@ resource "aws_network_acl" "private_NACL" {
   }
 }
 
-
-resource "aws_instance" "DB" {
-  ami  = "ami-03b13f993274ce14a"
-  instance_type = "t2.micro"
-  subnet_id = aws_subnet.private.id
-  vpc_security_group_ids = [aws_security_group.db_SG.id]
-  key_name = "Stefan_Terraform"
-  # associate_public_ip_address = true
-  # user_data = data.template_file.initdb.rendered
-  tags = {
-    Name = "Eng57.Stefan.DB.Terraform"
-  }
-}
-
-
-
-resource "aws_key_pair" "deployer" {
-  key_name   = "Stefan_Terraform"
-  public_key = var.ssh_key
+resource "aws_route_table_association" "db" {
+  subnet_id      = aws_subnet.private.id
+  route_table_id = aws_route_table.public_route.id
 }
