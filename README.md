@@ -1,27 +1,31 @@
-# Terraform 101
+### Terminology
 
-- Hashicorp tool
-- Used for Orchestration, in-line with Infrastructure as Code (IaC)
+- providers
+  sets location to as where resources will be applied
 
-IaC:
-- Configuration Management tools (Chef, Puppet, Ansible)
-- Orchestration tools (Terraform, Cloudform, other.)
+- resource
+  "tasks" or additions/changes you want to apply
 
-Combining both tools allows us to define our Infrastructure as Code
+- data
+  many uses regarding files, namely allows you to run template_file shell scripts within your created instance
 
-### Config Management
+- variable
+  can set variables in a separate variable.tf file which can be called in your main.tf file; used to abstract data and keep code DRY
 
-  Useful because they allow us to replicate changes across multiple servers (i.e. installing new packages). Since they can entirely provision machines, they make machines more immutable.
+- module
+  Used to reference nested modules (main.tf files). Similar to Python OOP, can be used to call and set values when used in conjuction with variable.tf files
 
-You should be able to terminate a machine, run a script, then recreate another machine in the exact same state as the previous machine
+- output
+  Used to store the result of a nested module task (i.e. aws_instance.private_ip) which can then be called through `module` and set as a variable.
 
-### Orchestration
 
-This will create the Infrastructure. Not only the machine, but the networking, security, monitoring, and all setup around the machine that creates a production environment.
+### Bash Commands
 
-Example usage:
-1. Automation server gets triggered
-2. Tests run in machine created from AMI
-3. Passing test triggers next step on automation server
-4. New AMI created with previous AMI + new code
-5. Calls terraform script to create infrastructure and deploy new AMI
+`terraform init` - initializes Terraform
+`terraform plan` - shows me what changes it plans to make
+`terraform apply` - checks AWS for what already exists, then applies changes specified
+`terraform destroy` - shuts down all infrastructure
+
+### Documentation
+
+Hashicorp has wonderfully extensive & modular Documentation on Terraform and its commands. Enjoy :)
