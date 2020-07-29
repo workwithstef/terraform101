@@ -122,7 +122,6 @@ resource "aws_network_acl" "public_NACL" {
   }
 }
 
-
 resource "aws_route_table" "public_route" {
   vpc_id = var.vpc_id
 
@@ -143,7 +142,6 @@ resource "aws_route_table_association" "app" {
 }
 
 
-
 data "template_file" "initapp" {
   template = file("./scripts/app/init.sh.tpl")
   vars = {
@@ -159,6 +157,7 @@ resource "aws_instance" "Web" {
   key_name = "Stefan_Terraform"
   associate_public_ip_address = true
   user_data = data.template_file.initapp.rendered
+
   tags = {
     Name = "Eng57.Stefan.App.Terraform"
   }

@@ -21,28 +21,20 @@ resource "aws_internet_gateway" "igw" {
 
 module "app_tier" {
   source = "./modules/app_tier"
+
   vpc_id = aws_vpc.VPC.id
   my_ip = var.my_ip
   ssh_key_var = var.ssh_key
   igw_id = aws_internet_gateway.igw.id
-  db_private_ip = aws_instance.DB.private_ip
-  # public_route_id = aws_route_table.public_route.id
-
-
+  db_private_ip = aws_instance.DB.private_ip # var.db_priv_ip
 }
 
 # module "db_tier" {
 #   source = "./modules/db_tier"
+#
 #   vpc_id = aws_vpc.VPC.id
 #   my_ip = var.my_ip
-# }
-
-# resource "aws_route_table" "private_route" {
-#   vpc_id = aws_vpc.VPC.id
-#
-#   tags = {
-#     Name = "Stefan.Route.Priv"
-#   }
+#   ssh_key_var = var.ssh_key
 # }
 
 resource "aws_subnet" "private" {
@@ -54,6 +46,7 @@ resource "aws_subnet" "private" {
     Name = "Eng57.Stefan.Sub.Priv"
   }
 }
+
 resource "aws_security_group" "db_SG" {
   name        = "Stefan.Terra.DB.SG"
   description = "Allow http and https inbound traffic"
@@ -143,21 +136,17 @@ resource "aws_network_acl" "private_NACL" {
   }
 }
 
-
 resource "aws_instance" "DB" {
   ami  = "ami-03b13f993274ce14a"
   instance_type = "t2.micro"
   subnet_id = aws_subnet.private.id
   vpc_security_group_ids = [aws_security_group.db_SG.id]
   key_name = "Stefan_Terraform"
-  # associate_public_ip_address = true
-  # user_data = data.template_file.initdb.rendered
+
   tags = {
     Name = "Eng57.Stefan.DB.Terraform"
   }
 }
-
-
 
 resource "aws_key_pair" "deployer" {
   key_name   = "Stefan_Terraform"
