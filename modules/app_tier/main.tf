@@ -4,7 +4,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Eng57.Stefan.Sub.Pub"
+    Name = "${var.tag_name}.Sub.Public"
   }
 }
 
@@ -46,7 +46,7 @@ resource "aws_security_group" "app_SG" {
   }
 
   tags = {
-    Name = "Stefan.Terra.App.SG"
+    Name = "${var.tag_name}.App.SG"
   }
 }
 
@@ -118,7 +118,7 @@ resource "aws_network_acl" "public_NACL" {
   }
 
   tags = {
-    Name = "Stefan.NACL.Pub"
+    Name = "${var.tag_name}.NACL.Pub"
   }
 }
 
@@ -132,7 +132,7 @@ resource "aws_route_table" "public_route" {
 
 
   tags = {
-    Name = "Stefan.Route.Pub"
+    Name = "${var.tag_name}.Route.Pub"
   }
 }
 
@@ -159,6 +159,6 @@ resource "aws_instance" "Web" {
   user_data = data.template_file.initapp.rendered
 
   tags = {
-    Name = "Eng57.Stefan.App.Terraform"
+    Name = "${var.tag_name}.App"
   }
 }

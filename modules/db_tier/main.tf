@@ -1,13 +1,3 @@
-# module "app_tier" {
-#   source = "../app_tier"
-#
-#   vpc_id = aws_vpc.VPC.id
-#   my_ip = var.my_ip
-#   ssh_key_var = var.ssh_key
-#   igw_id = aws_internet_gateway.igw.id
-#   db_private_ip = aws_instance.DB.private_ip
-# }
-
 
 resource "aws_subnet" "private" {
   vpc_id     = var.vpc_id
@@ -15,7 +5,7 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Eng57.Stefan.Sub.Priv"
+    Name = "${var.tag_name}.Sub.Private"
   }
 }
 resource "aws_security_group" "db_SG" {
@@ -29,8 +19,8 @@ resource "aws_security_group" "db_SG" {
     from_port   = 27017
     to_port     = 27017
     protocol    = "tcp"
-    # security_groups = [module.app_tier.app_sec_group_id]
-    cidr_blocks = ["99.0.1.0/24"]
+    security_groups = [var.app_security_group_id]
+    # cidr_blocks = ["99.0.1.0/24"]
 
   }
 
@@ -51,7 +41,7 @@ resource "aws_security_group" "db_SG" {
   }
 
   tags = {
-    Name = "Stefan.Terra.DB.SG"
+    Name = "${var.tag_name}.DB.SG"
   }
 }
 
@@ -63,7 +53,7 @@ resource "aws_network_acl" "private_NACL" {
     protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
-    cidr_block = "99.0.1.0/24"
+    cidr_block = var.pub_subnet_cidrblock
     from_port  = 27017
     to_port    = 27017
   }
@@ -99,13 +89,13 @@ resource "aws_network_acl" "private_NACL" {
     protocol   = "tcp"
     rule_no    = 120
     action     = "allow"
-    cidr_block = "99.0.1.0/24"
+    cidr_block = var.pub_subnet_cidrblock
     from_port  = 1024
     to_port    = 65535
   }
 
   tags = {
-    Name = "Stefan.NACL.Priv"
+    Name = "${var.tag_name}.NACL.Priv"
   }
 }
 
@@ -117,6 +107,6 @@ resource "aws_instance" "DB" {
   # key_name = "Stefan_Terraform"
 
   tags = {
-    Name = "Eng57.Stefan.DB.Terraform"
+    Name = "${var.tag_name}.DB"
   }
 }
