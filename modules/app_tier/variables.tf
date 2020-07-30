@@ -22,3 +22,7 @@ variable "db_private_ip" {
 variable "ssh_key_var" {
   description = "keys to the palace"
 }
+
+variable "web_image" {
+  description = "ami image of app"
+}

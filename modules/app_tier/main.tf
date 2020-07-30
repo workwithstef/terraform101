@@ -150,7 +150,7 @@ data "template_file" "initapp" {
 }
 
 resource "aws_instance" "Web" {
-  ami  = "ami-067df73fe6e724431"
+  ami  = var.web_image
   instance_type = "t2.micro"
   subnet_id = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.app_SG.id]
